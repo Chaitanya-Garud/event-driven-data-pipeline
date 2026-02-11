@@ -1,0 +1,5 @@
+aws_region            = "ap-south-1"
+bucket_name           = "chaitanya-event-pipeline-dev-001"
+environment           = "dev"
+processor_lambda_name = "csv-processor-dev"
+reporter_lambda_name  = "daily-reporter-dev"
