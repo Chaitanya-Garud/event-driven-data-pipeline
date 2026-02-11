@@ -9,14 +9,12 @@ pipeline {
 
         stage('Checkout Code') {
             steps {
-                echo "Checking out source code..."
                 checkout scm
             }
         }
 
         stage('Package Lambda Functions') {
             steps {
-                echo "Packaging Lambda functions..."
                 sh 'chmod +x scripts/package.sh'
                 sh './scripts/package.sh'
             }
@@ -24,38 +22,28 @@ pipeline {
 
         stage('Terraform Init') {
             steps {
-                echo "Initializing Terraform..."
                 dir('terraform') {
-                    sh 'terraform init'
-                }
-            }
-        }
-
-        stage('Terraform Plan') {
-            steps {
-                echo "Planning infrastructure changes..."
-                dir('terraform') {
-                    sh 'terraform plan'
+                    withCredentials([[
+                        $class: 'AmazonWebServicesCredentialsBinding',
+                        credentialsId: 'aws-creds'
+                    ]]) {
+                        sh 'terraform init'
+                    }
                 }
             }
         }
 
         stage('Terraform Apply') {
             steps {
-                echo "Applying infrastructure changes..."
                 dir('terraform') {
-                    sh 'terraform apply -auto-approve'
+                    withCredentials([[
+                        $class: 'AmazonWebServicesCredentialsBinding',
+                        credentialsId: 'aws-creds'
+                    ]]) {
+                        sh 'terraform apply -auto-approve'
+                    }
                 }
             }
-        }
-    }
-
-    post {
-        success {
-            echo "Deployment completed successfully!"
-        }
-        failure {
-            echo "Pipeline failed. Please check logs."
         }
     }
 }
