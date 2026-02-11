@@ -1,4 +1,4 @@
-aws_region            = "ap-south-1"
+aws_region            = "ap-northeast-1"
 bucket_name           = "chaitanya-event-pipeline-dev-001"
 environment           = "dev"
 processor_lambda_name = "csv-processor-dev"
