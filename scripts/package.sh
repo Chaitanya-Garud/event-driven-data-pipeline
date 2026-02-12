@@ -1,17 +1,22 @@
 #!/bin/bash
+set -e
 
 echo "Packaging Lambda functions..."
 
-cd "$(dirname "$0")/.." || exit
+ROOT_DIR=$(pwd)
 
-# Remove old zip files
-rm -f lambda/processor.zip
-rm -f lambda/reporter.zip
+mkdir -p lambda
 
-echo "Creating processor.zip..."
-powershell Compress-Archive -Path lambda/processor/* -DestinationPath lambda/processor.zip
+echo "Packaging processor lambda..."
+cd lambda/processor
+zip -r ../processor.zip .
+cd "$ROOT_DIR"
 
-echo "Creating reporter.zip..."
-powershell Compress-Archive -Path lambda/reporter/* -DestinationPath lambda/reporter.zip
+echo "Packaging reporter lambda..."
+cd lambda/reporter
+zip -r ../reporter.zip .
+cd "$ROOT_DIR"
 
 echo "Lambda packaging completed successfully!"
+
+ls -lh lambda
