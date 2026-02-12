@@ -10,14 +10,29 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      # 1️⃣ Checkout repo
       - name: Checkout code
         uses: actions/checkout@v4
 
+      # 2️⃣ Install zip (needed for lambda packaging)
+      - name: Install zip
+        run: sudo apt-get update && sudo apt-get install -y zip
+
+      # 3️⃣ Package Lambda functions
+      - name: Package Lambda functions
+        run: |
+          chmod +x scripts/package.sh
+          ./scripts/package.sh
+          echo "Lambda directory after packaging:"
+          ls -l lambda
+
+      # 4️⃣ Setup Terraform
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
         with:
           terraform_version: 1.6.6
 
+      # 5️⃣ Configure AWS credentials
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
@@ -25,18 +40,13 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ secrets.AWS_REGION }}
 
-      - name: Package Lambda functions
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y zip
-          chmod +x scripts/package.sh
-          ./scripts/package.sh
-
+      # 6️⃣ Terraform Init
       - name: Terraform Init
         run: |
           cd terraform
           terraform init
 
+      # 7️⃣ Terraform Apply
       - name: Terraform Apply
         run: |
           cd terraform
