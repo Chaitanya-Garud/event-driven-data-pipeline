@@ -25,6 +25,13 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ secrets.AWS_REGION }}
 
+      - name: Package Lambda functions
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y zip
+          chmod +x scripts/package.sh
+          ./scripts/package.sh
+
       - name: Terraform Init
         run: |
           cd terraform
